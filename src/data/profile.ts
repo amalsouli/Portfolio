@@ -18,12 +18,12 @@ export const profile = {
   cv: { en: 'cv/Amal-Souli-CV-EN.pdf', fr: 'cv/Amal-Souli-CV-FR.pdf' } as L,
   about: {
     en: [
-      'I am a software engineer (ESPRIT, 2025) who likes building products end to end: from the data model and the API to the screen people actually touch.',
-      'Today I work on an enterprise knowledge-management and laboratory (LIMS) platform: an agentic AI assistant, AI-powered extraction of safety data sheets, a LIMS ↔ SAP integration in C# / .NET, and platform features in JavaScript and Delphi. Before that I shipped mobile apps in Flutter, .NET MAUI and Kotlin, and web platforms in PHP and WordPress.',
+      'Software Engineer specialising in enterprise applications, AI integration and system interoperability. I design and deliver reliable, maintainable solutions with C# / .NET, JavaScript / TypeScript, Angular and Python.',
+      'At Bassetti Group, I contribute to TEEXMA, an enterprise knowledge-management and LIMS platform. My recent work covers the integration of an agentic AI assistant, AI-based extraction of safety data sheets with Azure OpenAI, and a LIMS–SAP integration built on .NET REST APIs. My background in cross-platform mobile development (Flutter, .NET MAUI) and web platforms gives me a complete view of the product lifecycle, from requirements to production.',
     ],
     fr: [
-      'Je suis ingénieure logiciel (ESPRIT, 2025) et j’aime construire des produits de bout en bout : du modèle de données et de l’API jusqu’à l’écran que les utilisateurs touchent vraiment.',
-      'Aujourd’hui je travaille sur une plateforme d’entreprise de gestion des connaissances et de laboratoire (LIMS) : un assistant IA agentique, l’extraction de fiches de données de sécurité par IA, une intégration LIMS ↔ SAP en C# / .NET et des fonctionnalités plateforme en JavaScript et Delphi. Avant cela, j’ai livré des applications mobiles en Flutter, .NET MAUI et Kotlin, et des plateformes web en PHP et WordPress.',
+      'Ingénieure logiciel spécialisée dans les applications d’entreprise, l’intégration de l’IA et l’interopérabilité des systèmes. Je conçois et livre des solutions fiables et maintenables en C# / .NET, JavaScript / TypeScript, Angular et Python.',
+      'Chez Bassetti Group, je contribue à TEEXMA, plateforme d’entreprise de gestion des connaissances et LIMS. Mes réalisations récentes couvrent l’intégration d’un assistant IA agentique, l’extraction de fiches de données de sécurité par IA avec Azure OpenAI et une intégration LIMS–SAP reposant sur des API REST .NET. Mon expérience en développement mobile cross-platform (Flutter, .NET MAUI) et en plateformes web me donne une vision complète du cycle de vie produit, du besoin à la mise en production.',
     ],
   },
 };
