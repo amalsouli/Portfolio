@@ -8,8 +8,8 @@ export const profile = {
   name: 'Amal Souli',
   title: { en: 'Software Engineer', fr: 'Ingénieure Logiciel' } as L,
   roles: {
-    en: ['Mobile apps with Flutter & .NET MAUI', 'Full-stack web with Angular & Node.js', 'Enterprise software in C# / .NET', 'AI-assisted features'],
-    fr: ['Apps mobiles Flutter & .NET MAUI', 'Web full-stack Angular & Node.js', 'Logiciels d’entreprise C# / .NET', 'Fonctionnalités assistées par l’IA'],
+    en: ['AI assistants & document extraction', 'Enterprise integrations in C# / .NET', 'Web apps in JavaScript, TypeScript & Angular', 'Mobile apps with Flutter & .NET MAUI'],
+    fr: ['Assistants IA & extraction de documents', 'Intégrations d’entreprise en C# / .NET', 'Apps web JavaScript, TypeScript & Angular', 'Apps mobiles Flutter & .NET MAUI'],
   },
   location: { en: 'Ariana, Tunisia', fr: 'Ariana, Tunisie' } as L,
   email: 'Amal.Souli@esprit.tn',
@@ -19,11 +19,11 @@ export const profile = {
   about: {
     en: [
       'I am a software engineer (ESPRIT, 2025) who likes building products end to end: from the data model and the API to the screen people actually touch.',
-      'Today I work on an enterprise knowledge-management and laboratory (LIMS) platform, across C# / .NET services, REST APIs, Angular front-ends and Python services. Before that I shipped mobile apps in Flutter, .NET MAUI and Kotlin, and web platforms in PHP and WordPress.',
+      'Today I work on an enterprise knowledge-management and laboratory (LIMS) platform: an agentic AI assistant, AI-powered extraction of safety data sheets, a LIMS ↔ SAP integration in C# / .NET, and platform features in JavaScript and Delphi. Before that I shipped mobile apps in Flutter, .NET MAUI and Kotlin, and web platforms in PHP and WordPress.',
     ],
     fr: [
       'Je suis ingénieure logiciel (ESPRIT, 2025) et j’aime construire des produits de bout en bout : du modèle de données et de l’API jusqu’à l’écran que les utilisateurs touchent vraiment.',
-      'Aujourd’hui je travaille sur une plateforme d’entreprise de gestion des connaissances et de laboratoire (LIMS) : services C# / .NET, API REST, front-ends Angular et services Python. Avant cela, j’ai livré des applications mobiles en Flutter, .NET MAUI et Kotlin, et des plateformes web en PHP et WordPress.',
+      'Aujourd’hui je travaille sur une plateforme d’entreprise de gestion des connaissances et de laboratoire (LIMS) : un assistant IA agentique, l’extraction de fiches de données de sécurité par IA, une intégration LIMS ↔ SAP en C# / .NET et des fonctionnalités plateforme en JavaScript et Delphi. Avant cela, j’ai livré des applications mobiles en Flutter, .NET MAUI et Kotlin, et des plateformes web en PHP et WordPress.',
     ],
   },
 };
@@ -41,21 +41,23 @@ export const experiences: Experience[] = [
   {
     role: { en: 'Software Engineer', fr: 'Ingénieure Logiciel' },
     company: 'Bassetti Group',
-    period: { en: 'Present', fr: 'Aujourd’hui' },
+    period: { en: '2026 – Present', fr: '2026 – aujourd’hui' },
     current: true,
-    stack: ['C#', '.NET', 'Delphi', 'Angular', 'Python', 'FastAPI', 'SQL Server', 'Git'],
+    stack: ['C#', '.NET', 'JavaScript', 'TypeScript', 'Angular', 'Python', 'Azure OpenAI', 'Delphi', 'SAP API', 'Jenkins', 'SonarQube'],
     points: {
       en: [
-        'Build and maintain customer-specific modules of TEEXMA, an enterprise knowledge-management and LIMS platform (Delphi, C# / .NET).',
-        'Develop REST API endpoints in .NET and Angular front-end features for the platform.',
-        'Contribute to Python (FastAPI) services, including an AI conversational assistant and a document-extraction module.',
-        'Handle migrations to new platform versions, regression testing and customer deliveries.',
+        'Integrated an agentic AI assistant into the web client of TEEXMA, an enterprise knowledge-management and LIMS platform: Angular chat UI, tool-step panel, answer rendering and rating (TypeScript).',
+        'Delivered an AI-powered safety-data-sheet extractor: Angular upload portal, Azure OpenAI section extraction, and one-click release packaging of API, portal and file publisher.',
+        'Built a laboratory-reception integration between the LIMS and SAP: C# / .NET REST API for scanned samples, authenticated SAP gateway calls, Delphi business module and regression tests.',
+        'Shipped platform features in JavaScript and Delphi (time-tracking comments and permissions, generic map) and migrated customer developments to a new major platform version.',
+        'Fixed SonarQube issues and delivered through pull requests, Jenkins builds and bilingual impact analyses.',
       ],
       fr: [
-        'Développement et maintenance de modules spécifiques clients de TEEXMA, plateforme d’entreprise de gestion des connaissances et LIMS (Delphi, C# / .NET).',
-        'Développement d’endpoints d’API REST .NET et de fonctionnalités front-end Angular.',
-        'Contribution à des services Python (FastAPI), dont un assistant conversationnel IA et un module d’extraction de documents.',
-        'Migrations vers les nouvelles versions de la plateforme, tests de non-régression et livraisons clients.',
+        'Intégration d’un assistant IA agentique dans le client web de TEEXMA, plateforme d’entreprise de gestion des connaissances et LIMS : interface de chat Angular, panneau des étapes d’outils, rendu et notation des réponses (TypeScript).',
+        'Livraison d’un extracteur de fiches de données de sécurité par IA : portail Angular d’import, extraction des sections via Azure OpenAI et packaging en une seule release de l’API, du portail et du publieur de fichiers.',
+        'Intégration de la réception laboratoire entre le LIMS et SAP : API REST C# / .NET pour les échantillons scannés, appels authentifiés à la passerelle SAP, module métier Delphi et tests de non-régression.',
+        'Fonctionnalités plateforme en JavaScript et Delphi (commentaires et permissions du suivi des temps, carte générique) et migration de développements clients vers une nouvelle version majeure.',
+        'Correction des anomalies SonarQube, livraison via pull requests, builds Jenkins et analyses d’impact bilingues.',
       ],
     },
   },
@@ -67,13 +69,11 @@ export const experiences: Experience[] = [
     points: {
       en: [
         'Own the development and maintenance of all the company’s web solutions.',
-        'Design and optimise customer-facing websites and internal platforms used to manage the showrooms.',
-        'Keep the applications fast, secure and easy to use, and answer the needs of each department.',
+        'Design and optimise customer-facing websites and internal platforms used to manage the showrooms, with a focus on performance, security and usability.',
       ],
       fr: [
         'Responsable du développement et de la maintenance de l’ensemble des solutions web de l’entreprise.',
-        'Conception et optimisation des sites clients et des plateformes internes de gestion des showrooms.',
-        'Performance, sécurité et ergonomie des applications, en réponse aux besoins de chaque département.',
+        'Conception et optimisation des sites clients et des plateformes internes de gestion des showrooms, avec un accent sur la performance, la sécurité et l’ergonomie.',
       ],
     },
   },
@@ -142,12 +142,66 @@ export type Project = {
   tagline: L;
   description: L;
   stack: string[];
-  tags: ('Mobile' | 'Web' | 'Backend' | 'Desktop' | 'AI')[];
+  tags: ('Mobile' | 'Web' | 'Backend' | 'Desktop' | 'AI' | 'Integration')[];
   links?: { label: string; url: string }[];
   featured?: boolean;
+  /** Professional project at the current employer (private code, shown in the "Current work" block). */
+  work?: boolean;
 };
 
 export const projects: Project[] = [
+  {
+    name: 'Agentic AI Assistant',
+    year: '2026',
+    emoji: '🤖',
+    work: true,
+    tagline: { en: 'AI agent inside an enterprise web platform', fr: 'Agent IA intégré à une plateforme web d’entreprise' },
+    description: {
+      en: 'Integrated an agentic conversational assistant into the platform’s web client: chat UI, live panel of the agent’s tool steps, rich answer rendering with custom tags, file-metadata editing and answer rating. Hardened through bug fixing and SonarQube clean-up.',
+      fr: 'Intégration d’un assistant conversationnel agentique dans le client web de la plateforme : interface de chat, panneau temps réel des étapes d’outils de l’agent, rendu enrichi des réponses, édition de métadonnées de fichiers et notation des réponses. Fiabilisé par corrections de bugs et nettoyage SonarQube.',
+    },
+    stack: ['Angular', 'TypeScript', 'JavaScript', 'SCSS', 'Python', 'FastAPI', 'LLM agents'],
+    tags: ['AI', 'Web'],
+  },
+  {
+    name: 'AI Safety Data Sheet Extractor',
+    year: '2026',
+    emoji: '🧪',
+    work: true,
+    tagline: { en: 'AI reads chemical safety data sheets', fr: 'L’IA lit les fiches de données de sécurité' },
+    description: {
+      en: 'Portal to upload safety data sheets (PDF) and extract their sections with an Azure OpenAI model into the platform. I built portal features and the release pipeline that packages the API, the Angular portal and the file publisher into one deliverable.',
+      fr: 'Portail d’import de fiches de données de sécurité (PDF) dont les sections sont extraites par un modèle Azure OpenAI vers la plateforme. J’ai développé des fonctionnalités du portail et le pipeline de release qui package l’API, le portail Angular et le publieur de fichiers en un seul livrable.',
+    },
+    stack: ['Angular', 'TypeScript', 'Python', 'Azure OpenAI', 'CI/CD'],
+    tags: ['AI', 'Web'],
+  },
+  {
+    name: 'LIMS ↔ SAP Lab Reception',
+    year: '2026',
+    emoji: '🔗',
+    work: true,
+    tagline: { en: 'Laboratory ↔ ERP integration in .NET', fr: 'Intégration laboratoire ↔ ERP en .NET' },
+    description: {
+      en: 'End-to-end sample reception for a quality laboratory: a .NET REST API receives scanned samples, creates them on the right analysis request, and exchanges statuses and results with SAP through an authenticated gateway. Delphi business module, regression tests and single-build Jenkins delivery.',
+      fr: 'Réception d’échantillons de bout en bout pour un laboratoire qualité : une API REST .NET reçoit les échantillons scannés, les crée sur la bonne demande d’analyse et échange statuts et résultats avec SAP via une passerelle authentifiée. Module métier Delphi, tests de non-régression et livraison Jenkins en un build.',
+    },
+    stack: ['C#', '.NET', 'ASP.NET Core', 'REST', 'SAP API', 'Delphi', 'Jenkins'],
+    tags: ['Integration', 'Backend'],
+  },
+  {
+    name: 'Platform features & migrations',
+    year: '2026',
+    emoji: '🧭',
+    work: true,
+    tagline: { en: 'JavaScript & Delphi on a large codebase', fr: 'JavaScript & Delphi sur une large base de code' },
+    description: {
+      en: 'Time-tracking evolutions (comments on locked entries, separate view / edit permissions, historical overruns), a generic map component, publishing fixes, and migration of customer developments to a new major platform version.',
+      fr: 'Évolutions du suivi des temps (commentaires sur saisies verrouillées, permissions de lecture / écriture séparées, dépassements historiques), composant de carte générique, corrections de publication et migration de développements clients vers une nouvelle version majeure.',
+    },
+    stack: ['JavaScript', 'Delphi', 'XML', 'Git'],
+    tags: ['Web', 'Backend'],
+  },
   {
     name: 'Brainiacs',
     year: '2024',
@@ -242,10 +296,11 @@ export const projects: Project[] = [
 ];
 
 export const skills: { group: L; items: string[] }[] = [
-  { group: { en: 'Languages', fr: 'Langages' }, items: ['C#', 'TypeScript', 'JavaScript', 'Dart', 'Kotlin', 'Java', 'Python', 'PHP', 'SQL', 'Delphi'] },
+  { group: { en: 'Languages', fr: 'Langages' }, items: ['JavaScript', 'TypeScript', 'C#', 'Python', 'Dart', 'Kotlin', 'Java', 'PHP', 'SQL', 'Delphi'] },
+  { group: { en: 'Web & Backend', fr: 'Web & Backend' }, items: ['Angular', 'React', 'Node.js', 'Express', 'Nest.js', '.NET / ASP.NET Core', 'REST APIs', 'FastAPI', 'Spring Boot', 'Django', 'WordPress'] },
+  { group: { en: 'AI & Integration', fr: 'IA & Intégration' }, items: ['Azure OpenAI', 'LLM agents', 'Document extraction', 'SAP API integration'] },
   { group: { en: 'Mobile', fr: 'Mobile' }, items: ['Flutter', 'FlutterFlow', '.NET MAUI', 'Android (Kotlin)', 'iOS (Swift)'] },
-  { group: { en: 'Web & Backend', fr: 'Web & Backend' }, items: ['Angular', '.NET / ASP.NET', 'Node.js', 'Nest.js', 'Express', 'FastAPI', 'Spring Boot', 'Django', 'WordPress'] },
-  { group: { en: 'Data & Tools', fr: 'Données & Outils' }, items: ['MySQL', 'SQL Server', 'MongoDB', 'Firebase', 'Git / GitHub', 'Postman', 'Figma', 'Visual Studio', 'AI coding assistants'] },
+  { group: { en: 'Data, DevOps & Tools', fr: 'Données, DevOps & Outils' }, items: ['SQL Server', 'MySQL', 'MongoDB', 'Firebase', 'Git / GitHub', 'Jenkins', 'SonarQube', 'Postman', 'Figma'] },
 ];
 
 export const education = [
@@ -266,6 +321,12 @@ export const ui = {
   contactMe: { en: 'Get in touch', fr: 'Me contacter' },
   current: { en: 'Current', fr: 'Actuel' },
   all: { en: 'All', fr: 'Tous' },
+  workTitle: { en: 'Current work · Bassetti Group', fr: 'Travaux actuels · Bassetti Group' },
+  workNote: {
+    en: 'Professional projects on an enterprise knowledge-management & LIMS platform. Code is private; descriptions are generic.',
+    fr: 'Projets professionnels sur une plateforme d’entreprise de gestion des connaissances & LIMS. Code privé, descriptions génériques.',
+  },
+  personalTitle: { en: 'Academic & personal projects', fr: 'Projets académiques & personnels' },
   education: { en: 'Education', fr: 'Formation' },
   languages: { en: 'Languages', fr: 'Langues' },
   contactText: {

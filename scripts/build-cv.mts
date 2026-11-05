@@ -1,7 +1,9 @@
-// Generates the one-page CV (EN + FR) from src/data/profile.ts and prints it to PDF
-// with a headless Chromium browser (Edge or Chrome).
-// Usage: node scripts/build-cv.mts
-import { writeFileSync, mkdirSync, existsSync, readFileSync } from 'node:fs';
+// Generates an international, ATS-friendly CV (EN + FR) from src/data/profile.ts
+// and prints it to PDF with a headless Chromium browser (Edge or Chrome).
+// Format rules: single column, real selectable text, standard section headings,
+// reverse-chronological order, no photo / age / icons / skill bars, A4.
+// Usage: npm run cv
+import { writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { resolve, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -13,120 +15,100 @@ const tmpDir = resolve(root, 'cv/.out');
 mkdirSync(outDir, { recursive: true });
 mkdirSync(tmpDir, { recursive: true });
 
-const avatar = `data:image/jpeg;base64,${readFileSync(resolve(root, 'cv/avatar.jpg')).toString('base64')}`;
-const portfolio = 'https://amalsouli.github.io/Portfolio/';
-
 const t = {
-  summary: { en: 'Profile', fr: 'Profil' },
-  experience: { en: 'Experience', fr: 'Expérience' },
-  projects: { en: 'Selected projects', fr: 'Projets sélectionnés' },
-  skills: { en: 'Skills', fr: 'Compétences' },
+  summary: { en: 'Professional Summary', fr: 'Profil professionnel' },
+  skills: { en: 'Technical Skills', fr: 'Compétences techniques' },
+  experience: { en: 'Professional Experience', fr: 'Expérience professionnelle' },
+  projects: { en: 'Academic Projects', fr: 'Projets académiques' },
   education: { en: 'Education', fr: 'Formation' },
   languages: { en: 'Languages', fr: 'Langues' },
-  contact: { en: 'Contact', fr: 'Contact' },
-  earlier: { en: 'Earlier', fr: 'Auparavant' },
   pitch: {
-    en: 'Software engineer building enterprise, web and mobile applications end to end. Hands-on with C# / .NET, Angular, Python (FastAPI) and Flutter / .NET MAUI, from REST APIs and data models to polished cross-platform UIs. Comfortable in multi-team delivery: migrations, regression testing, customer releases and AI-assisted development.',
-    fr: 'Ingénieure logiciel qui conçoit des applications d’entreprise, web et mobiles de bout en bout. Pratique de C# / .NET, Angular, Python (FastAPI) et Flutter / .NET MAUI, des API REST et modèles de données jusqu’aux interfaces cross-platform soignées. À l’aise en livraison multi-équipes : migrations, tests de non-régression, livraisons clients et développement assisté par l’IA.',
+    en: 'Software Engineer with hands-on experience delivering enterprise, web and mobile applications end to end. Currently building AI features (agentic assistant, LLM-based document extraction) and enterprise integrations (LIMS ↔ SAP REST APIs) with C# / .NET, JavaScript / TypeScript, Angular and Python. Previous delivery in Flutter, .NET MAUI, Kotlin and PHP. Used to code review, CI builds, quality gates and bilingual (English / French) collaboration.',
+    fr: 'Ingénieure logiciel avec une expérience concrète de la livraison d’applications d’entreprise, web et mobiles de bout en bout. Développe actuellement des fonctionnalités d’IA (assistant agentique, extraction de documents par LLM) et des intégrations d’entreprise (API REST LIMS ↔ SAP) en C# / .NET, JavaScript / TypeScript, Angular et Python. Réalisations antérieures en Flutter, .NET MAUI, Kotlin et PHP. Habituée aux revues de code, builds CI, quality gates et au travail bilingue (français / anglais).',
   },
 };
 
 const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+const host = (u: string) => u.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
+const portfolio = 'https://amalsouli.github.io/Portfolio/';
 
 function html(lang: Lang): string {
-  const detailed = experiences.slice(0, 3);
-  const earlier = experiences.slice(3);
-  const featured = projects.filter((p) => p.featured);
-  const others = projects.filter((p) => !p.featured);
+  // Multi-bullet roles get a full block; single-bullet roles (internships, student job) a compact one.
+  const main = experiences.filter((e) => e.points[lang].length > 1);
+  // Non-technical student job is kept on the portfolio only, to fit one page.
+  const compact = experiences.filter((e) => e.points[lang].length === 1 && e.stack.length > 0);
+  // Hotix Guest is already covered by the PFE internship.
+  const academic = projects.filter((p) => !p.work && ['Brainiacs', 'Ecocircuit', 'QuickShip'].includes(p.name));
 
-  return `<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><title>${profile.name} — CV</title>
+  return `<!doctype html><html lang="${lang}"><head><meta charset="utf-8">
+<title>Amal Souli - ${lang === 'fr' ? 'CV' : 'Resume'}</title>
+<meta name="author" content="Amal Souli">
 <style>
-@page { size: A4; margin: 0; }
+@page { size: A4; margin: 11mm 14mm 10mm; }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Segoe UI', Inter, Arial, sans-serif; font-size: 9pt; line-height: 1.42; color: #1f2937; width: 210mm; height: 297mm; display: grid; grid-template-columns: 64mm 1fr; }
-aside { background: linear-gradient(180deg, #2e1065 0%, #4c1d95 55%, #6d28d9 100%); color: #ede9fe; padding: 11mm 7mm 9mm; }
-main { padding: 10mm 9mm 8mm 8mm; }
-.photo { width: 34mm; height: 34mm; border-radius: 50%; border: 2.5px solid #f0abfc; display: block; margin: 0 auto 4mm; object-fit: cover; }
-aside h2 { font-size: 8.4pt; letter-spacing: .14em; text-transform: uppercase; color: #f0abfc; margin: 5.5mm 0 2mm; padding-bottom: 1mm; border-bottom: 1px solid rgba(240,171,252,.35); }
-aside a, aside p { color: #ede9fe; text-decoration: none; word-break: break-word; }
-.ci { margin-bottom: 1.3mm; font-size: 8pt; }
-.ci b { display: block; font-size: 6.8pt; letter-spacing: .08em; text-transform: uppercase; color: #c4b5fd; font-weight: 600; }
-.sg { margin-bottom: 2.2mm; }
-.sg b { display: block; font-size: 7.6pt; color: #fff; margin-bottom: .6mm; }
-.sg span { display: inline-block; background: rgba(255,255,255,.12); border-radius: 3px; padding: .25mm 1.4mm; margin: 0 .8mm .9mm 0; font-size: 7.3pt; }
-.lang { display: flex; justify-content: space-between; font-size: 8pt; margin-bottom: .6mm; }
-.bar { height: 1.3mm; background: rgba(255,255,255,.15); border-radius: 1mm; margin-bottom: 1.8mm; }
-.bar i { display: block; height: 100%; border-radius: 1mm; background: linear-gradient(90deg, #f0abfc, #f9a8d4); }
-.edu { margin-bottom: 2mm; font-size: 8pt; }
-.edu b { color: #fff; display: block; }
-h1 { font-size: 24pt; line-height: 1.05; color: #1e1b4b; letter-spacing: -.01em; }
-h1 span { color: #7c3aed; }
-.role { font-size: 11pt; font-weight: 600; color: #7c3aed; margin-top: 1mm; }
-.links { margin-top: 1.5mm; font-size: 7.8pt; color: #6b7280; }
-.links a { color: #4c1d95; text-decoration: none; font-weight: 600; }
-main h2 { font-size: 9.6pt; letter-spacing: .12em; text-transform: uppercase; color: #4c1d95; margin: 4.2mm 0 2mm; display: flex; align-items: center; gap: 2mm; }
-main h2::after { content: ''; flex: 1; height: 1.5px; background: linear-gradient(90deg, #c4b5fd, transparent); }
-.pitch { font-size: 9.1pt; color: #374151; }
-.job { margin-bottom: 2.6mm; }
-.jh { display: flex; justify-content: space-between; align-items: baseline; gap: 2mm; }
-.jh b { font-size: 9.4pt; color: #111827; }
-.jh b em { font-style: normal; color: #7c3aed; }
-.jh span { font-size: 7.6pt; color: #6b7280; white-space: nowrap; }
-.job ul { margin: .8mm 0 0 4mm; }
-.job li { margin-bottom: .35mm; }
-.tech { font-size: 7.4pt; color: #6d28d9; margin-top: .6mm; }
-.early { font-size: 8.4pt; margin-bottom: 1.3mm; }
-.early b { color: #111827; }
-.early span { color: #6b7280; }
-.proj { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2.2mm; }
-.pc { border: 1px solid #ddd6fe; border-radius: 2mm; padding: 2mm; background: #faf5ff; }
-.pc b { font-size: 8.8pt; color: #111827; display: block; }
-.pc p { font-size: 8pt; margin-top: .6mm; color: #374151; }
-.pc .tech { margin-top: 1mm; }
-.more { font-size: 7.8pt; margin-top: 2mm; color: #374151; }
-.more b { color: #111827; }
+body { font-family: Calibri, Carlito, 'Segoe UI', Arial, sans-serif; font-size: 9.5pt; line-height: 1.25; color: #111; }
+a { color: inherit; text-decoration: none; }
+header { text-align: center; padding-bottom: 2.5mm; border-bottom: 1.2pt solid #1f3a5f; }
+h1 { font-size: 19pt; letter-spacing: .04em; color: #1f3a5f; font-weight: 700; }
+.headline { font-size: 11pt; font-weight: 600; margin-top: .6mm; }
+.contact { font-size: 9.2pt; margin-top: 1.2mm; color: #222; }
+.contact span + span::before { content: '  |  '; color: #888; white-space: pre; }
+h2 { font-size: 10.6pt; text-transform: uppercase; letter-spacing: .08em; color: #1f3a5f; border-bottom: .6pt solid #9aa9bd; padding-bottom: .5mm; margin: 3mm 0 1.3mm; }
+p.summary { text-align: justify; }
+table.skills { border-collapse: collapse; width: 100%; }
+table.skills td { padding: .25mm 0; vertical-align: top; }
+table.skills td:first-child { width: 43mm; font-weight: 700; }
+.job { margin-bottom: 1.9mm; page-break-inside: avoid; }
+.row { display: flex; justify-content: space-between; align-items: baseline; gap: 4mm; }
+.row .what { font-weight: 700; }
+.row .what em { font-style: normal; font-weight: 400; }
+.row .when { white-space: nowrap; font-size: 9.6pt; }
+ul { margin: .7mm 0 0 4.6mm; }
+li { margin-bottom: .2mm; padding-left: .5mm; }
+.tech { font-size: 9.2pt; color: #333; margin-top: .5mm; }
+.tech b { font-weight: 700; }
+.compact li { margin-bottom: .3mm; }
+.job.small { margin-bottom: 1.4mm; }
 </style></head><body>
-<aside>
-  <img class="photo" src="${avatar}" alt="${profile.name}">
-  <h2>${t.contact[lang]}</h2>
-  <div class="ci"><b>E-mail</b><a href="mailto:${profile.email}">${profile.email}</a></div>
-  <div class="ci"><b>Portfolio</b><a href="${portfolio}">amalsouli.github.io/Portfolio</a></div>
-  <div class="ci"><b>LinkedIn</b><a href="${profile.linkedin}">linkedin.com/in/amalsouli</a></div>
-  <div class="ci"><b>GitHub</b><a href="${profile.github}">github.com/amalsouli</a></div>
-  <div class="ci"><b>${lang === 'fr' ? 'Localisation' : 'Location'}</b>${esc(profile.location[lang])}</div>
-  <h2>${t.skills[lang]}</h2>
-  ${skills.map((g) => `<div class="sg"><b>${esc(g.group[lang])}</b>${g.items.map((i) => `<span>${esc(i)}</span>`).join('')}</div>`).join('')}
-  <h2>${t.education[lang]}</h2>
-  ${education.map((e) => `<div class="edu"><b>${esc(e.degree[lang])}</b>${esc(e.school.split(' — ')[0])} · ${e.period}</div>`).join('')}
-  <h2>${t.languages[lang]}</h2>
-  ${languages.map((l) => `<div class="lang"><span>${esc(l.name[lang])}</span><span>${esc(l.level[lang])}</span></div><div class="bar"><i style="width:${l.value}%"></i></div>`).join('')}
-</aside>
-<main>
-  <h1>Amal <span>SOULI</span></h1>
-  <div class="role">${esc(profile.title[lang])} · .NET · Angular · Flutter · Python</div>
-  <h2>${t.summary[lang]}</h2>
-  <p class="pitch">${esc(t.pitch[lang])}</p>
-  <h2>${t.experience[lang]}</h2>
-  ${detailed
-    .map(
-      (e) => `<div class="job"><div class="jh"><b>${esc(e.role[lang])} <em>· ${esc(e.company)}</em></b><span>${esc(e.period[lang])}</span></div>
-  <ul>${e.points[lang].map((p) => `<li>${esc(p)}</li>`).join('')}</ul>
-  <div class="tech">${e.stack.map(esc).join(' · ')}</div></div>`,
-    )
-    .join('')}
-  ${earlier
-    .map(
-      (e) => `<div class="early"><b>${esc(e.role[lang])} · ${esc(e.company)}</b> <span>(${esc(e.period[lang])})</span> — ${esc(e.points[lang][0])}${
-        e.stack.length ? ` <span>[${e.stack.map(esc).join(', ')}]</span>` : ''
-      }</div>`,
-    )
-    .join('')}
-  <h2>${t.projects[lang]}</h2>
-  <div class="proj">${featured
-    .map((p) => `<div class="pc"><b>${p.emoji} ${esc(p.name)} <span style="font-weight:400;color:#6b7280">· ${p.year}</span></b><p>${esc(p.tagline[lang])}.</p><div class="tech">${p.stack.map(esc).join(' · ')}</div></div>`)
-    .join('')}</div>
-  <p class="more">${others.map((p) => `<b>${esc(p.name)}</b> (${p.stack.slice(0, 3).map(esc).join(', ')})`).join(' · ')}</p>
-</main>
+<header>
+  <h1>AMAL SOULI</h1>
+  <div class="headline">${esc(profile.title[lang])} | C# / .NET · JavaScript / TypeScript · Angular · Python · Flutter</div>
+  <div class="contact">
+    <span>${esc(profile.location[lang])}</span><span><a href="mailto:${profile.email}">${profile.email}</a></span><span><a href="${profile.linkedin}">${host(profile.linkedin)}</a></span><span><a href="${profile.github}">${host(profile.github)}</a></span><span><a href="${portfolio}">${host(portfolio)}</a></span>
+  </div>
+</header>
+
+<h2>${t.summary[lang]}</h2>
+<p class="summary">${esc(t.pitch[lang])}</p>
+
+<h2>${t.skills[lang]}</h2>
+<table class="skills">${skills.map((g) => `<tr><td>${esc(g.group[lang])}</td><td>${g.items.map(esc).join(', ')}</td></tr>`).join('')}
+<tr><td>${t.languages[lang]}</td><td>${languages.map((l) => `${esc(l.name[lang])} (${esc(l.level[lang])})`).join(', ')}</td></tr></table>
+
+<h2>${t.experience[lang]}</h2>
+${main
+  .map(
+    (e) => `<div class="job"><div class="row"><span class="what">${esc(e.role[lang])} <em>— ${esc(e.company)}</em></span><span class="when">${esc(e.period[lang])}</span></div>
+<ul>${e.points[lang].map((p) => `<li>${esc(p)}</li>`).join('')}</ul>
+<div class="tech"><b>${lang === 'fr' ? 'Environnement' : 'Tech'} :</b> ${e.stack.map(esc).join(', ')}</div></div>`,
+  )
+  .join('')}
+${compact
+  .map(
+    (e) => `<div class="job small"><div class="row"><span class="what">${esc(e.role[lang])} <em>— ${esc(e.company)}</em></span><span class="when">${esc(e.period[lang])}</span></div>
+<div>${esc(e.points[lang][0])}${e.stack.length ? ` <i>(${e.stack.map(esc).join(', ')})</i>` : ''}</div></div>`,
+  )
+  .join('')}
+
+<h2>${t.projects[lang]}</h2>
+<ul class="compact">${academic
+  .map((p) => `<li><b>${esc(p.name)}</b> (${p.year}) — ${esc(p.tagline[lang])}. <i>${p.stack.map(esc).join(', ')}.</i></li>`)
+  .join('')}</ul>
+
+<h2>${t.education[lang]}</h2>
+${education
+  .map((e) => `<div class="row"><span class="what">${esc(e.degree[lang])} <em>— ${esc(e.school)}</em></span><span class="when">${e.period}</span></div>`)
+  .join('')}
 </body></html>`;
 }
 

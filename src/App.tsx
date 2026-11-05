@@ -4,6 +4,8 @@ import { profile, experiences, projects, skills, education, languages, ui, type 
 import { GitHubIcon, LinkedInIcon, MailIcon, DownloadIcon, PinIcon, SunIcon, MoonIcon, ArrowIcon } from './components/Icons';
 
 const asset = (p: string) => `${import.meta.env.BASE_URL}${p}`;
+const workProjects = projects.filter((p) => p.work);
+const personalProjects = projects.filter((p) => !p.work);
 
 function usePersisted<T extends string>(key: string, initial: T): [T, (v: T) => void] {
   const [value, setValue] = useState<T>(() => {
@@ -100,8 +102,8 @@ export default function App() {
     document.documentElement.lang = lang;
   }, [lang]);
 
-  const tags = useMemo(() => Array.from(new Set(projects.flatMap((p) => p.tags))), []);
-  const visible = filter === 'all' ? projects : projects.filter((p) => p.tags.includes(filter as Project['tags'][number]));
+  const tags = useMemo(() => Array.from(new Set(personalProjects.flatMap((p) => p.tags))), []);
+  const visible = filter === 'all' ? personalProjects : personalProjects.filter((p) => p.tags.includes(filter as Project['tags'][number]));
   const navItems = Object.entries(ui.nav) as [string, Record<Lang, string>][];
 
   return (
@@ -265,6 +267,43 @@ export default function App() {
 
       {/* Projects */}
       <Section id="projects" kicker="03" title={ui.nav.projects[lang]}>
+        <Reveal>
+          <div className="mb-6 flex flex-wrap items-end justify-between gap-2">
+            <h3 className="flex items-center gap-2 font-display text-xl font-bold text-slate-900 dark:text-white">
+              <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-emerald-500" />
+              {ui.workTitle[lang]}
+            </h3>
+            <p className="max-w-xl text-sm text-slate-500 dark:text-slate-400">{ui.workNote[lang]}</p>
+          </div>
+        </Reveal>
+        <div className="mb-16 grid gap-6 md:grid-cols-2">
+          {workProjects.map((p, i) => (
+            <Reveal key={p.name} delay={i * 0.06}>
+              <article className="group relative h-full rounded-2xl bg-gradient-to-br from-brand-500 via-fuchsia-500 to-pink-500 p-[1.5px] shadow-lg shadow-brand-600/10 transition hover:-translate-y-1 hover:shadow-xl hover:shadow-brand-600/20">
+                <div className="flex h-full flex-col rounded-[15px] bg-white p-6 dark:bg-[#12121f]">
+                  <div className="flex items-start justify-between gap-3">
+                    <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-600 to-pink-500 text-2xl shadow-md">{p.emoji}</span>
+                    <div className="flex flex-wrap justify-end gap-1.5">
+                      {p.tags.map((t) => (
+                        <span key={t} className="rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-bold text-brand-700 dark:bg-brand-500/15 dark:text-brand-300">{t}</span>
+                      ))}
+                    </div>
+                  </div>
+                  <h4 className="mt-4 font-display text-xl font-bold text-slate-900 dark:text-white">{p.name}</h4>
+                  <p className="mt-1 text-sm font-semibold text-brand-600 dark:text-brand-400">{p.tagline[lang]}</p>
+                  <p className="mt-3 flex-1 text-sm leading-relaxed text-slate-600 dark:text-slate-300">{p.description[lang]}</p>
+                  <div className="mt-4 flex flex-wrap gap-1.5">
+                    {p.stack.map((s) => (
+                      <span key={s} className="chip">{s}</span>
+                    ))}
+                  </div>
+                </div>
+              </article>
+            </Reveal>
+          ))}
+        </div>
+
+        <h3 className="mb-4 font-display text-xl font-bold text-slate-900 dark:text-white">{ui.personalTitle[lang]}</h3>
         <div className="mb-8 flex flex-wrap gap-2">
           {['all', ...tags].map((t) => (
             <button
