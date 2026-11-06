@@ -6,6 +6,14 @@ import { GitHubIcon, LinkedInIcon, MailIcon, DownloadIcon, PinIcon, SunIcon, Moo
 const asset = (p: string) => `${import.meta.env.BASE_URL}${p}`;
 const workProjects = projects.filter((p) => p.work);
 const personalProjects = projects.filter((p) => !p.work);
+const ribbon = skills.flatMap((g) => g.items);
+
+// Handwritten side notes, purely decorative.
+const notes = {
+  me: { en: 'that’s me!', fr: 'c’est moi !' },
+  open: { en: 'Open to new adventures', fr: 'Ouverte aux nouvelles aventures' },
+  say: { en: 'let’s create something lovely', fr: 'créons quelque chose de beau' },
+};
 
 function usePersisted<T extends string>(key: string, initial: T): [T, (v: T) => void] {
   const [value, setValue] = useState<T>(() => {
@@ -32,19 +40,34 @@ function Reveal({ children, delay = 0 }: { children: ReactNode; delay?: number }
       initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-60px' }}
-      transition={{ duration: 0.5, delay }}
+      transition={{ duration: 0.6, delay, ease: 'easeOut' }}
     >
       {children}
     </motion.div>
   );
 }
 
+/** Small four-point sparkle used as decoration. */
+function Sparkle({ className = '', delay = '0s' }: { className?: string; delay?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className={`pointer-events-none absolute animate-twinkle ${className}`} style={{ animationDelay: delay }}>
+      <path fill="currentColor" d="M12 0c.6 5.8 2.9 8.4 12 12-9.1 3.6-11.4 6.2-12 12-.6-5.8-2.9-8.4-12-12C9.1 8.4 11.4 5.8 12 0z" />
+    </svg>
+  );
+}
+
 function Section({ id, title, kicker, children }: { id: string; title: string; kicker: string; children: ReactNode }) {
   return (
-    <section id={id} className="container-x py-20 sm:py-24">
+    <section id={id} className="container-x relative py-20 sm:py-24">
       <Reveal>
-        <p className="font-display text-sm font-bold uppercase tracking-[0.2em] text-brand-600 dark:text-brand-400">{kicker}</p>
-        <h2 className="mt-2 font-display text-3xl font-bold text-slate-900 sm:text-4xl dark:text-white">{title}</h2>
+        <p className="font-script text-2xl text-brand-500 dark:text-brand-300">✿ {kicker}</p>
+        <h2 className="heading mt-1 text-4xl sm:text-5xl">
+          {title}
+          <span className="text-brand-400">.</span>
+        </h2>
+        <svg viewBox="0 0 120 12" className="mt-2 h-3 w-28 text-brand-300 dark:text-brand-400/60" aria-hidden="true">
+          <path d="M2 8 C 20 2, 30 12, 50 6 S 80 2, 118 7" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+        </svg>
       </Reveal>
       <div className="mt-10">{children}</div>
     </section>
@@ -80,7 +103,7 @@ function TypingRoles({ roles }: { roles: string[] }) {
   }, [roles]);
 
   return (
-    <span className="font-mono text-brand-600 dark:text-brand-400">
+    <span className="font-medium text-brand-600 dark:text-brand-300">
       {text}
       <span className="ml-0.5 inline-block w-[2px] animate-pulse bg-current align-middle">&nbsp;</span>
     </span>
@@ -105,19 +128,27 @@ export default function App() {
   const tags = useMemo(() => Array.from(new Set(personalProjects.flatMap((p) => p.tags))), []);
   const visible = filter === 'all' ? personalProjects : personalProjects.filter((p) => p.tags.includes(filter as Project['tags'][number]));
   const navItems = Object.entries(ui.nav) as [string, Record<Lang, string>][];
+  const [first, ...rest] = profile.name.split(' ');
 
   return (
     <div className="relative overflow-x-hidden">
+      {/* Page background */}
+      <div className="bg-mesh pointer-events-none fixed inset-0 -z-10" />
+      <div className="bg-dots pointer-events-none fixed inset-0 -z-10" />
+
       {/* Header */}
-      <header className="fixed inset-x-0 top-0 z-50 border-b border-slate-200/60 bg-slate-50/75 backdrop-blur-lg dark:border-white/5 dark:bg-[#0b0b14]/70">
-        <nav className="container-x flex h-16 items-center justify-between">
-          <a href="#top" className="font-display text-lg font-bold">
-            <span className="gradient-text">amal</span>
-            <span className="text-slate-400">.souli</span>
+      <header className="fixed inset-x-0 top-3 z-50 px-3">
+        <nav className="container-x flex h-14 items-center justify-between rounded-full border border-brand-100 bg-white/70 shadow-lg shadow-brand-200/30 backdrop-blur-xl dark:border-brand-300/10 dark:bg-plum-800/70 dark:shadow-none">
+          <a href="#top" className="font-script text-3xl leading-none text-brand-600 dark:text-brand-300">
+            Amal<span className="text-lilac-400">♡</span>
           </a>
-          <div className="hidden items-center gap-6 md:flex">
+          <div className="hidden items-center gap-1 md:flex">
             {navItems.map(([id, label]) => (
-              <a key={id} href={`#${id}`} className="text-sm font-medium text-slate-600 transition hover:text-brand-600 dark:text-slate-300 dark:hover:text-brand-400">
+              <a
+                key={id}
+                href={`#${id}`}
+                className="rounded-full px-3.5 py-1.5 text-sm font-medium text-ink-soft transition hover:bg-brand-50 hover:text-brand-600 dark:text-pink-100/70 dark:hover:bg-white/5 dark:hover:text-brand-300"
+              >
                 {label[lang]}
               </a>
             ))}
@@ -125,14 +156,14 @@ export default function App() {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setLang(lang === 'en' ? 'fr' : 'en')}
-              className="rounded-lg border border-slate-300 px-2.5 py-1.5 text-xs font-bold dark:border-white/15"
+              className="rounded-full bg-brand-50 px-3 py-1.5 text-xs font-bold text-brand-700 transition hover:bg-brand-100 dark:bg-white/5 dark:text-brand-200"
               aria-label="Switch language"
             >
               {lang === 'en' ? 'FR' : 'EN'}
             </button>
             <button
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-              className="rounded-lg border border-slate-300 p-1.5 dark:border-white/15"
+              className="rounded-full bg-brand-50 p-2 text-brand-700 transition hover:bg-brand-100 dark:bg-white/5 dark:text-brand-200"
               aria-label="Toggle theme"
             >
               {theme === 'dark' ? <SunIcon className="h-4 w-4" /> : <MoonIcon className="h-4 w-4" />}
@@ -142,22 +173,30 @@ export default function App() {
       </header>
 
       {/* Hero */}
-      <section id="top" className="relative pt-32 pb-16 sm:pt-40 sm:pb-24">
-        <div className="blob pointer-events-none absolute -top-24 left-1/2 h-96 w-96 -translate-x-1/2 rounded-full bg-brand-500" />
-        <div className="blob pointer-events-none absolute top-40 -right-20 h-72 w-72 rounded-full bg-pink-500" />
-        <div className="container-x relative grid items-center gap-12 md:grid-cols-[1.4fr_1fr]">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
-            <p className="inline-flex items-center gap-2 rounded-full border border-emerald-300/50 bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 dark:border-emerald-400/20 dark:bg-emerald-400/10 dark:text-emerald-300">
-              <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-500" />
-              {profile.title[lang]} · Bassetti Group
+      <section id="top" className="relative pt-32 pb-16 sm:pt-40 sm:pb-20">
+        <Sparkle className="left-[6%] top-32 h-6 w-6 text-brand-300" />
+        <Sparkle className="left-[45%] top-24 h-4 w-4 text-lilac-300" delay="1s" />
+        <Sparkle className="right-[8%] top-28 h-5 w-5 text-peach-300" delay="2s" />
+        <Sparkle className="bottom-10 left-[30%] h-3 w-3 text-brand-400" delay="1.5s" />
+        <div className="container-x relative grid items-center gap-14 md:grid-cols-[1.35fr_1fr]">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
+            <p className="inline-flex items-center gap-2 rounded-full border border-brand-200 bg-white/70 px-3.5 py-1 text-xs font-semibold text-brand-700 shadow-sm dark:border-brand-300/20 dark:bg-white/5 dark:text-brand-200">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-400 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-500" />
+              </span>
+              {experiences[0].role[lang]} · Bassetti Group
             </p>
-            <h1 className="mt-5 font-display text-4xl font-bold leading-tight text-slate-900 sm:text-6xl dark:text-white">
-              {ui.hello[lang]} <span className="gradient-text">{profile.name}</span>
+            <p className="mt-6 font-script text-3xl text-ink-soft dark:text-pink-100/70">{ui.hello[lang]}</p>
+            <h1 className="heading text-6xl leading-[0.95] sm:text-8xl">
+              {first}
+              <br />
+              <span className="gradient-text italic">{rest.join(' ')}</span>
             </h1>
-            <p className="mt-4 h-8 text-lg sm:text-xl">
+            <p className="mt-6 min-h-[2rem] text-lg sm:text-xl">
               <TypingRoles roles={profile.roles[lang]} />
             </p>
-            <p className="mt-6 max-w-xl text-base leading-relaxed text-slate-600 dark:text-slate-400">{profile.about[lang][0]}</p>
+            <p className="muted mt-5 max-w-xl text-base leading-relaxed">{profile.about[lang][0]}</p>
             <div className="mt-8 flex flex-wrap gap-3">
               <a className="btn-primary" href={asset(profile.cv[lang])} download>
                 <DownloadIcon /> {ui.downloadCv[lang]}
@@ -166,42 +205,73 @@ export default function App() {
                 <MailIcon className="h-4 w-4" /> {ui.contactMe[lang]}
               </a>
             </div>
-            <div className="mt-8 flex items-center gap-4 text-slate-500 dark:text-slate-400">
-              <a href={profile.github} target="_blank" rel="noreferrer" aria-label="GitHub" className="hover:text-brand-600">
-                <GitHubIcon />
-              </a>
-              <a href={profile.linkedin} target="_blank" rel="noreferrer" aria-label="LinkedIn" className="hover:text-brand-600">
-                <LinkedInIcon />
-              </a>
-              <a href={`mailto:${profile.email}`} aria-label="Email" className="hover:text-brand-600">
-                <MailIcon />
-              </a>
-              <span className="inline-flex items-center gap-1 text-sm">
+            <div className="mt-8 flex items-center gap-3 text-brand-600 dark:text-brand-300">
+              {[
+                { href: profile.github, label: 'GitHub', icon: <GitHubIcon className="h-5 w-5" /> },
+                { href: profile.linkedin, label: 'LinkedIn', icon: <LinkedInIcon className="h-5 w-5" /> },
+                { href: `mailto:${profile.email}`, label: 'Email', icon: <MailIcon className="h-5 w-5" /> },
+              ].map((s) => (
+                <a
+                  key={s.label}
+                  href={s.href}
+                  target={s.href.startsWith('http') ? '_blank' : undefined}
+                  rel="noreferrer"
+                  aria-label={s.label}
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-md shadow-brand-200/50 transition hover:-translate-y-1 hover:rotate-6 dark:bg-white/5 dark:shadow-none"
+                >
+                  {s.icon}
+                </a>
+              ))}
+              <span className="muted ml-2 inline-flex items-center gap-1 text-sm">
                 <PinIcon /> {profile.location[lang]}
               </span>
             </div>
           </motion.div>
+
+          {/* Photo in a morphing blob */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.7, delay: 0.15 }}
-            className="relative mx-auto w-56 sm:w-72"
+            initial={{ opacity: 0, scale: 0.85, rotate: -4 }}
+            animate={{ opacity: 1, scale: 1, rotate: 0 }}
+            transition={{ duration: 0.8, delay: 0.15 }}
+            className="relative mx-auto w-64 sm:w-80"
           >
-            <div className="absolute -inset-3 animate-[spin_12s_linear_infinite] rounded-full bg-gradient-to-tr from-brand-600 via-fuchsia-500 to-pink-400 opacity-80" />
+            <div className="absolute -inset-5 animate-morph bg-gradient-to-br from-brand-300 via-lilac-300 to-peach-200 opacity-90 blur-[2px] dark:opacity-60" />
+            <div className="absolute -inset-2 animate-morph rounded-full border-2 border-dashed border-brand-300/70 [animation-delay:-4s]" />
             <img
               src={asset('avatar.jpg')}
               alt={profile.name}
-              className="relative aspect-square w-full rounded-full border-4 border-slate-50 object-cover dark:border-[#0b0b14]"
+              className="relative aspect-square w-full animate-morph border-[6px] border-white object-cover shadow-2xl shadow-brand-300/40 dark:border-plum-800"
             />
+            <span className="absolute -left-6 top-6 animate-float text-3xl" aria-hidden="true">🌸</span>
+            <span className="absolute -right-3 bottom-10 animate-float text-2xl [animation-delay:-3s]" aria-hidden="true">✨</span>
+            <div className="absolute -bottom-10 -left-4 flex items-end gap-1 sm:-left-14">
+              <svg viewBox="0 0 60 40" className="h-8 w-12 rotate-12 text-brand-400" aria-hidden="true">
+                <path d="M4 34 C 20 30, 40 22, 54 6" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+                <path d="M44 6 L 55 5 L 52 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              <span className="-rotate-6 font-script text-2xl text-brand-600 dark:text-brand-300">{notes.me[lang]}</span>
+            </div>
           </motion.div>
         </div>
       </section>
 
+      {/* Skills ribbon */}
+      <div className="relative -rotate-1 border-y border-brand-200/60 bg-gradient-to-r from-brand-400 via-lilac-400 to-peach-300 py-3 text-white shadow-lg shadow-brand-300/30 dark:border-transparent dark:from-brand-600 dark:via-lilac-500 dark:to-brand-400">
+        <div className="flex w-max animate-marquee gap-8 whitespace-nowrap font-display text-lg italic">
+          {[...ribbon, ...ribbon].map((s, i) => (
+            <span key={i} className="flex items-center gap-8">
+              {s} <span aria-hidden="true">✿</span>
+            </span>
+          ))}
+        </div>
+      </div>
+
       {/* About */}
       <Section id="about" kicker="01" title={ui.nav.about[lang]}>
-        <div className="grid gap-6 md:grid-cols-[1.5fr_1fr]">
+        <div className="grid gap-8 md:grid-cols-[1.5fr_1fr]">
           <Reveal>
-            <div className="card space-y-4 p-6 text-base leading-relaxed text-slate-600 sm:p-8 dark:text-slate-300">
+            <div className="card muted relative space-y-4 p-7 text-base leading-relaxed sm:p-9">
+              <span className="absolute -top-5 left-8 font-display text-7xl leading-none text-brand-300" aria-hidden="true">“</span>
               {profile.about[lang].map((p) => (
                 <p key={p}>{p}</p>
               ))}
@@ -210,14 +280,17 @@ export default function App() {
           <Reveal delay={0.1}>
             <div className="grid h-full grid-cols-2 gap-4">
               {[
-                { n: `${experiences.length}`, l: { en: 'roles & internships', fr: 'postes & stages' } },
-                { n: `${projects.length}`, l: { en: 'shipped projects', fr: 'projets réalisés' } },
-                { n: '4', l: { en: 'mobile stacks', fr: 'stacks mobiles' } },
-                { n: '3', l: { en: 'languages spoken', fr: 'langues parlées' } },
+                { n: `${experiences.length}`, l: { en: 'roles & internships', fr: 'postes & stages' }, c: 'from-brand-100 to-brand-50 -rotate-2' },
+                { n: `${projects.length}`, l: { en: 'shipped projects', fr: 'projets réalisés' }, c: 'from-lilac-100 to-white rotate-2' },
+                { n: '4', l: { en: 'mobile stacks', fr: 'stacks mobiles' }, c: 'from-peach-100 to-white rotate-1' },
+                { n: '3', l: { en: 'languages spoken', fr: 'langues parlées' }, c: 'from-brand-50 to-lilac-100 -rotate-1' },
               ].map((s) => (
-                <div key={s.n + s.l.en} className="card flex flex-col justify-center p-5 text-center">
-                  <span className="font-display text-3xl font-bold gradient-text">{s.n}</span>
-                  <span className="mt-1 text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">{s.l[lang]}</span>
+                <div
+                  key={s.l.en}
+                  className={`flex flex-col justify-center rounded-3xl bg-gradient-to-br p-5 text-center shadow-md shadow-brand-200/40 transition hover:rotate-0 hover:scale-105 dark:from-white/5 dark:to-white/[0.02] dark:shadow-none ${s.c}`}
+                >
+                  <span className="font-display text-4xl font-semibold text-brand-600 dark:text-brand-300">{s.n}</span>
+                  <span className="muted mt-1 text-xs font-semibold uppercase tracking-wide">{s.l[lang]}</span>
                 </div>
               ))}
             </div>
@@ -227,28 +300,37 @@ export default function App() {
 
       {/* Experience */}
       <Section id="experience" kicker="02" title={ui.nav.experience[lang]}>
-        <ol className="relative space-y-8 border-l-2 border-brand-200 pl-6 sm:pl-8 dark:border-brand-500/20">
+        <ol className="relative space-y-8 pl-8 sm:pl-10">
+          <span className="absolute left-[11px] top-2 bottom-2 w-[3px] rounded-full bg-gradient-to-b from-brand-300 via-lilac-300 to-peach-200 sm:left-[15px] dark:opacity-50" aria-hidden="true" />
           {experiences.map((e, i) => (
             <li key={e.company + e.period.en} className="relative">
               <span
-                className={`absolute -left-[33px] top-6 h-4 w-4 rounded-full border-4 border-slate-50 sm:-left-[41px] dark:border-[#0b0b14] ${
-                  e.current ? 'bg-emerald-500' : 'bg-brand-500'
+                className={`absolute -left-8 top-5 flex h-6 w-6 items-center justify-center rounded-full text-sm text-white shadow-md sm:-left-10 sm:h-8 sm:w-8 ${
+                  e.current ? 'bg-gradient-to-br from-brand-500 to-lilac-400' : 'bg-brand-300 dark:bg-brand-400/60'
                 }`}
-              />
+                aria-hidden="true"
+              >
+                ✿
+              </span>
               <Reveal delay={Math.min(i * 0.05, 0.2)}>
-                <div className="card p-5 sm:p-6">
+                <div className="card p-6 transition hover:-translate-y-0.5 sm:p-7">
                   <div className="flex flex-wrap items-baseline justify-between gap-2">
-                    <h3 className="font-display text-lg font-bold text-slate-900 dark:text-white">
-                      {e.role[lang]} <span className="text-brand-600 dark:text-brand-400">@ {e.company}</span>
+                    <h3 className="heading text-xl">
+                      {e.role[lang]} <span className="italic text-brand-500 dark:text-brand-300">@ {e.company}</span>
                     </h3>
-                    <span className="text-sm font-medium text-slate-500">
-                      {e.current && <span className="mr-2 rounded bg-emerald-100 px-1.5 py-0.5 text-xs font-bold text-emerald-700 dark:bg-emerald-400/10 dark:text-emerald-300">{ui.current[lang]}</span>}
+                    <span className="muted text-sm font-medium">
+                      {e.current && (
+                        <span className="mr-2 rounded-full bg-gradient-to-r from-brand-400 to-lilac-400 px-2.5 py-0.5 text-xs font-bold text-white">{ui.current[lang]}</span>
+                      )}
                       {e.period[lang]}
                     </span>
                   </div>
-                  <ul className="mt-3 list-disc space-y-1.5 pl-5 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                  <ul className="muted mt-4 space-y-2 text-sm leading-relaxed">
                     {e.points[lang].map((p) => (
-                      <li key={p}>{p}</li>
+                      <li key={p} className="flex gap-2">
+                        <span className="mt-[3px] text-brand-400" aria-hidden="true">♡</span>
+                        <span>{p}</span>
+                      </li>
                     ))}
                   </ul>
                   {e.stack.length > 0 && (
@@ -269,30 +351,32 @@ export default function App() {
       <Section id="projects" kicker="03" title={ui.nav.projects[lang]}>
         <Reveal>
           <div className="mb-6 flex flex-wrap items-end justify-between gap-2">
-            <h3 className="flex items-center gap-2 font-display text-xl font-bold text-slate-900 dark:text-white">
-              <span className="h-2.5 w-2.5 animate-pulse rounded-full bg-emerald-500" />
+            <h3 className="heading flex items-center gap-2 text-2xl">
+              <span className="text-brand-400" aria-hidden="true">✦</span>
               {ui.workTitle[lang]}
             </h3>
-            <p className="max-w-xl text-sm text-slate-500 dark:text-slate-400">{ui.workNote[lang]}</p>
+            <p className="muted max-w-xl text-sm">{ui.workNote[lang]}</p>
           </div>
         </Reveal>
-        <div className="mb-16 grid gap-6 md:grid-cols-2">
+        <div className="mb-20 grid gap-6 md:grid-cols-2">
           {workProjects.map((p, i) => (
             <Reveal key={p.name} delay={i * 0.06}>
-              <article className="group relative h-full rounded-2xl bg-gradient-to-br from-brand-500 via-fuchsia-500 to-pink-500 p-[1.5px] shadow-lg shadow-brand-600/10 transition hover:-translate-y-1 hover:shadow-xl hover:shadow-brand-600/20">
-                <div className="flex h-full flex-col rounded-[15px] bg-white p-6 dark:bg-[#12121f]">
+              <article className="group relative h-full rounded-[1.9rem] bg-gradient-to-br from-brand-300 via-lilac-300 to-peach-200 p-[2px] shadow-xl shadow-brand-200/40 transition duration-300 hover:-translate-y-1.5 hover:rotate-[0.6deg] dark:from-brand-500/60 dark:via-lilac-500/50 dark:to-brand-400/40 dark:shadow-none">
+                <div className="flex h-full flex-col rounded-[1.8rem] bg-white p-7 dark:bg-plum-800">
                   <div className="flex items-start justify-between gap-3">
-                    <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-brand-600 to-pink-500 text-2xl shadow-md">{p.emoji}</span>
+                    <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-100 via-lilac-100 to-peach-100 text-3xl shadow-inner transition group-hover:scale-110 group-hover:-rotate-6 dark:from-white/10 dark:to-white/5">
+                      {p.emoji}
+                    </span>
                     <div className="flex flex-wrap justify-end gap-1.5">
                       {p.tags.map((t) => (
-                        <span key={t} className="rounded-full bg-brand-50 px-2.5 py-0.5 text-xs font-bold text-brand-700 dark:bg-brand-500/15 dark:text-brand-300">{t}</span>
+                        <span key={t} className="rounded-full bg-lilac-100 px-2.5 py-0.5 text-xs font-bold text-lilac-500 dark:bg-lilac-400/15 dark:text-lilac-300">{t}</span>
                       ))}
                     </div>
                   </div>
-                  <h4 className="mt-4 font-display text-xl font-bold text-slate-900 dark:text-white">{p.name}</h4>
-                  <p className="mt-1 text-sm font-semibold text-brand-600 dark:text-brand-400">{p.tagline[lang]}</p>
-                  <p className="mt-3 flex-1 text-sm leading-relaxed text-slate-600 dark:text-slate-300">{p.description[lang]}</p>
-                  <div className="mt-4 flex flex-wrap gap-1.5">
+                  <h4 className="heading mt-5 text-2xl">{p.name}</h4>
+                  <p className="mt-1 font-script text-xl text-brand-500 dark:text-brand-300">{p.tagline[lang]}</p>
+                  <p className="muted mt-3 flex-1 text-sm leading-relaxed">{p.description[lang]}</p>
+                  <div className="mt-5 flex flex-wrap gap-1.5">
                     {p.stack.map((s) => (
                       <span key={s} className="chip">{s}</span>
                     ))}
@@ -303,7 +387,10 @@ export default function App() {
           ))}
         </div>
 
-        <h3 className="mb-4 font-display text-xl font-bold text-slate-900 dark:text-white">{ui.personalTitle[lang]}</h3>
+        <h3 className="heading mb-4 flex items-center gap-2 text-2xl">
+          <span className="text-lilac-400" aria-hidden="true">✦</span>
+          {ui.personalTitle[lang]}
+        </h3>
         <div className="mb-8 flex flex-wrap gap-2">
           {['all', ...tags].map((t) => (
             <button
@@ -311,8 +398,8 @@ export default function App() {
               onClick={() => setFilter(t)}
               className={`rounded-full px-4 py-1.5 text-sm font-semibold transition ${
                 filter === t
-                  ? 'bg-brand-600 text-white shadow-md shadow-brand-600/30'
-                  : 'border border-slate-300 text-slate-600 hover:border-brand-400 dark:border-white/15 dark:text-slate-300'
+                  ? 'bg-gradient-to-r from-brand-500 to-lilac-400 text-white shadow-md shadow-brand-300/50'
+                  : 'border-2 border-brand-100 bg-white/70 text-ink-soft hover:border-brand-300 hover:text-brand-600 dark:border-white/10 dark:bg-transparent dark:text-pink-100/70'
               }`}
             >
               {t === 'all' ? ui.all[lang] : t}
@@ -321,7 +408,7 @@ export default function App() {
         </div>
         <motion.div layout className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           <AnimatePresence mode="popLayout">
-            {visible.map((p) => (
+            {visible.map((p, i) => (
               <motion.article
                 layout
                 key={p.name}
@@ -329,29 +416,29 @@ export default function App() {
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
                 transition={{ duration: 0.25 }}
-                className="card group flex flex-col p-6 transition hover:-translate-y-1 hover:border-brand-400/60 hover:shadow-xl hover:shadow-brand-600/10"
+                className={`card group flex flex-col p-6 transition duration-300 hover:-translate-y-1.5 hover:border-brand-300 ${i % 2 ? 'hover:rotate-1' : 'hover:-rotate-1'}`}
               >
                 <div className="flex items-start justify-between">
-                  <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-brand-100 to-pink-100 text-2xl dark:from-brand-500/20 dark:to-pink-500/20">
+                  <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-100 to-lilac-100 text-2xl transition group-hover:scale-110 dark:from-brand-500/20 dark:to-lilac-500/20">
                     {p.emoji}
                   </span>
-                  <span className="text-xs font-semibold text-slate-400">{p.year}</span>
+                  <span className="rounded-full bg-peach-100 px-2 py-0.5 text-xs font-bold text-brand-700 dark:bg-white/5 dark:text-pink-100/70">{p.year}</span>
                 </div>
-                <h3 className="mt-4 font-display text-xl font-bold text-slate-900 dark:text-white">
+                <h3 className="heading mt-4 text-xl">
                   {p.name}
-                  {p.featured && <span className="ml-2 align-middle text-xs text-amber-500">★</span>}
+                  {p.featured && <span className="ml-2 align-middle text-sm text-brand-400">★</span>}
                 </h3>
-                <p className="mt-1 text-sm font-medium text-brand-600 dark:text-brand-400">{p.tagline[lang]}</p>
-                <p className="mt-3 flex-1 text-sm leading-relaxed text-slate-600 dark:text-slate-400">{p.description[lang]}</p>
+                <p className="mt-1 text-sm font-semibold text-brand-500 dark:text-brand-300">{p.tagline[lang]}</p>
+                <p className="muted mt-3 flex-1 text-sm leading-relaxed">{p.description[lang]}</p>
                 <div className="mt-4 flex flex-wrap gap-1.5">
                   {p.stack.map((s) => (
                     <span key={s} className="chip">{s}</span>
                   ))}
                 </div>
                 {p.links && (
-                  <div className="mt-4 flex gap-4 border-t border-slate-200 pt-4 dark:border-white/10">
+                  <div className="mt-4 flex gap-4 border-t border-dashed border-brand-200 pt-4 dark:border-white/10">
                     {p.links.map((l) => (
-                      <a key={l.url} href={l.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-sm font-semibold text-slate-700 hover:text-brand-600 dark:text-slate-200">
+                      <a key={l.url} href={l.url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 text-sm font-semibold text-brand-600 hover:text-lilac-500 dark:text-brand-300">
                         <GitHubIcon className="h-4 w-4" /> {l.label} <ArrowIcon className="h-3 w-3" />
                       </a>
                     ))}
@@ -368,11 +455,16 @@ export default function App() {
         <div className="grid gap-6 md:grid-cols-2">
           {skills.map((g, i) => (
             <Reveal key={g.group.en} delay={i * 0.05}>
-              <div className="card h-full p-6">
-                <h3 className="font-display text-lg font-bold text-slate-900 dark:text-white">{g.group[lang]}</h3>
+              <div className="card h-full p-6 sm:p-7">
+                <h3 className="heading text-xl">{g.group[lang]}</h3>
                 <div className="mt-4 flex flex-wrap gap-2">
-                  {g.items.map((s) => (
-                    <span key={s} className="rounded-lg border border-brand-200 bg-brand-50 px-3 py-1 text-sm font-medium text-brand-700 dark:border-brand-400/20 dark:bg-brand-500/10 dark:text-brand-300">
+                  {g.items.map((s, j) => (
+                    <span
+                      key={s}
+                      className={`rounded-full px-3.5 py-1 text-sm font-medium transition hover:-translate-y-0.5 ${
+                        ['bg-brand-50 text-brand-700', 'bg-lilac-100 text-lilac-500', 'bg-peach-100 text-brand-700'][j % 3]
+                      } dark:bg-white/5 dark:text-pink-100/80`}
+                    >
                       {s}
                     </span>
                   ))}
@@ -383,13 +475,13 @@ export default function App() {
         </div>
         <div className="mt-6 grid gap-6 md:grid-cols-2">
           <Reveal>
-            <div className="card h-full p-6">
-              <h3 className="font-display text-lg font-bold text-slate-900 dark:text-white">🎓 {ui.education[lang]}</h3>
+            <div className="card h-full p-6 sm:p-7">
+              <h3 className="heading text-xl">🎓 {ui.education[lang]}</h3>
               <ul className="mt-4 space-y-4">
                 {education.map((e) => (
-                  <li key={e.period}>
-                    <p className="font-semibold text-slate-800 dark:text-slate-100">{e.degree[lang]}</p>
-                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                  <li key={e.period} className="rounded-2xl bg-brand-50/60 p-4 dark:bg-white/5">
+                    <p className="font-semibold text-ink dark:text-white">{e.degree[lang]}</p>
+                    <p className="muted text-sm">
                       {e.school} · {e.period}
                     </p>
                   </li>
@@ -398,22 +490,22 @@ export default function App() {
             </div>
           </Reveal>
           <Reveal delay={0.05}>
-            <div className="card h-full p-6">
-              <h3 className="font-display text-lg font-bold text-slate-900 dark:text-white">🌍 {ui.languages[lang]}</h3>
-              <ul className="mt-4 space-y-4">
+            <div className="card h-full p-6 sm:p-7">
+              <h3 className="heading text-xl">🌍 {ui.languages[lang]}</h3>
+              <ul className="mt-4 space-y-5">
                 {languages.map((l) => (
                   <li key={l.name.en}>
                     <div className="flex justify-between text-sm">
-                      <span className="font-semibold text-slate-800 dark:text-slate-100">{l.name[lang]}</span>
-                      <span className="text-slate-500">{l.level[lang]}</span>
+                      <span className="font-semibold text-ink dark:text-white">{l.name[lang]}</span>
+                      <span className="font-script text-lg leading-none text-brand-500 dark:text-brand-300">{l.level[lang]}</span>
                     </div>
-                    <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-white/10">
+                    <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-brand-100 dark:bg-white/10">
                       <motion.div
-                        className="h-full rounded-full bg-gradient-to-r from-brand-600 to-pink-500"
+                        className="h-full rounded-full bg-gradient-to-r from-brand-400 via-lilac-400 to-peach-300"
                         initial={{ width: 0 }}
                         whileInView={{ width: `${l.value}%` }}
                         viewport={{ once: true }}
-                        transition={{ duration: 1 }}
+                        transition={{ duration: 1.1 }}
                       />
                     </div>
                   </li>
@@ -427,34 +519,41 @@ export default function App() {
       {/* Contact */}
       <Section id="contact" kicker="05" title={ui.nav.contact[lang]}>
         <Reveal>
-          <div className="card relative overflow-hidden p-8 text-center sm:p-12">
-            <div className="blob pointer-events-none absolute -bottom-24 left-1/2 h-64 w-64 -translate-x-1/2 rounded-full bg-brand-500" />
-            <p className="relative mx-auto max-w-xl text-lg text-slate-600 dark:text-slate-300">{ui.contactText[lang]}</p>
+          <div className="relative overflow-hidden rounded-[2.5rem] bg-gradient-to-br from-brand-400 via-lilac-400 to-peach-300 p-8 text-center text-white shadow-2xl shadow-brand-300/40 sm:p-14 dark:from-brand-600 dark:via-lilac-500 dark:to-brand-500 dark:shadow-none">
+            <Sparkle className="left-8 top-8 h-6 w-6 text-white/80" />
+            <Sparkle className="bottom-10 right-10 h-8 w-8 text-white/70" delay="1.2s" />
+            <Sparkle className="right-1/4 top-6 h-4 w-4 text-white/60" delay="2s" />
+            <p className="font-script text-3xl">{notes.say[lang]} ♡</p>
+            <p className="relative mx-auto mt-3 max-w-xl text-lg text-white/90">{ui.contactText[lang]}</p>
             <div className="relative mt-8 flex flex-wrap justify-center gap-3">
-              <a className="btn-primary" href={`mailto:${profile.email}`}>
+              <a className="btn bg-white text-brand-600 shadow-lg hover:-translate-y-0.5" href={`mailto:${profile.email}`}>
                 <MailIcon className="h-4 w-4" /> {profile.email}
               </a>
-              <a className="btn-ghost" href={profile.linkedin} target="_blank" rel="noreferrer">
+              <a className="btn border-2 border-white/70 text-white hover:-translate-y-0.5 hover:bg-white/10" href={profile.linkedin} target="_blank" rel="noreferrer">
                 <LinkedInIcon className="h-4 w-4" /> LinkedIn
               </a>
-              <a className="btn-ghost" href={profile.github} target="_blank" rel="noreferrer">
+              <a className="btn border-2 border-white/70 text-white hover:-translate-y-0.5 hover:bg-white/10" href={profile.github} target="_blank" rel="noreferrer">
                 <GitHubIcon className="h-4 w-4" /> GitHub
               </a>
             </div>
-            <div className="relative mt-6 flex flex-wrap justify-center gap-4 text-sm">
-              <a className="inline-flex items-center gap-1 font-semibold text-brand-600 hover:underline dark:text-brand-400" href={asset(profile.cv.en)} download>
+            <div className="relative mt-6 flex flex-wrap justify-center gap-5 text-sm">
+              <a className="inline-flex items-center gap-1 font-semibold underline-offset-4 hover:underline" href={asset(profile.cv.en)} download>
                 <DownloadIcon /> CV English
               </a>
-              <a className="inline-flex items-center gap-1 font-semibold text-brand-600 hover:underline dark:text-brand-400" href={asset(profile.cv.fr)} download>
+              <a className="inline-flex items-center gap-1 font-semibold underline-offset-4 hover:underline" href={asset(profile.cv.fr)} download>
                 <DownloadIcon /> CV Français
               </a>
             </div>
+            <p className="mt-6 text-xs font-semibold uppercase tracking-[0.2em] text-white/80">✦ {notes.open[lang]} ✦</p>
           </div>
         </Reveal>
       </Section>
 
-      <footer className="border-t border-slate-200 py-8 text-center text-sm text-slate-500 dark:border-white/5">
-        © {new Date().getFullYear()} {profile.name} · {ui.footer[lang]}
+      <footer className="py-10 text-center text-sm">
+        <p className="font-script text-2xl text-brand-500 dark:text-brand-300">made with ♡ by {profile.name}</p>
+        <p className="muted mt-1">
+          © {new Date().getFullYear()} · {ui.footer[lang]}
+        </p>
       </footer>
     </div>
   );
