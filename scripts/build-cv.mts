@@ -23,8 +23,8 @@ const t = {
   education: { en: 'Education', fr: 'Formation' },
   languages: { en: 'Languages', fr: 'Langues' },
   pitch: {
-    en: 'Full-stack Software Engineer with hands-on experience delivering enterprise, web and mobile applications end to end, from Angular / JavaScript front-ends to C# / .NET and Python back-ends. Currently building AI features (agentic assistant, LLM-based document extraction) and enterprise integrations (LIMS ↔ SAP REST APIs) with C# / .NET, JavaScript / TypeScript, Angular and Python. Previous delivery in Flutter, .NET MAUI, Kotlin and PHP; bilingual English / French.',
-    fr: 'Ingénieure logiciel full-stack avec une expérience concrète de la livraison d’applications d’entreprise, web et mobiles de bout en bout, du front-end Angular / JavaScript au back-end C# / .NET et Python. Développe actuellement des fonctionnalités d’IA (assistant agentique, extraction de documents par LLM) et des intégrations d’entreprise (API REST LIMS ↔ SAP) en C# / .NET, JavaScript / TypeScript, Angular et Python. Réalisations antérieures en Flutter, .NET MAUI, Kotlin et PHP ; bilingue français / anglais.',
+    en: 'Full-stack Software Engineer who designs and delivers enterprise, web and mobile applications, from front-end (Angular, TypeScript, JavaScript) to back-end (C# / .NET, Python). At Bassetti Group, I build AI features and integrations between enterprise systems. Earlier experience in mobile development with Flutter and .NET MAUI.',
+    fr: 'Ingénieure logiciel full-stack, je conçois et livre des applications d’entreprise, web et mobiles, du front-end (Angular, TypeScript, JavaScript) au back-end (C# / .NET, Python). Chez Bassetti Group, je développe des fonctionnalités d’IA et des intégrations entre systèmes d’entreprise. Expérience antérieure en développement mobile avec Flutter et .NET MAUI.',
   },
 };
 
