@@ -8,8 +8,8 @@ export const profile = {
   name: 'Amal Souli',
   title: { en: 'Software Engineer', fr: 'Ingénieure Logiciel' } as L,
   roles: {
-    en: ['AI assistants & document extraction', 'Enterprise integrations in C# / .NET', 'Web apps in JavaScript, TypeScript & Angular', 'Mobile apps with Flutter & .NET MAUI'],
-    fr: ['Assistants IA & extraction de documents', 'Intégrations d’entreprise en C# / .NET', 'Apps web JavaScript, TypeScript & Angular', 'Apps mobiles Flutter & .NET MAUI'],
+    en: ['Full-stack: Angular front-end, .NET & Python back-end', 'AI assistants & document extraction', 'Enterprise integrations in C# / .NET', 'Web apps in JavaScript, TypeScript & Angular', 'Mobile apps with Flutter & .NET MAUI'],
+    fr: ['Full-stack : front Angular, back .NET & Python', 'Assistants IA & extraction de documents', 'Intégrations d’entreprise en C# / .NET', 'Apps web JavaScript, TypeScript & Angular', 'Apps mobiles Flutter & .NET MAUI'],
   },
   location: { en: 'Ariana, Tunisia', fr: 'Ariana, Tunisie' } as L,
   email: 'Amal.Souli@esprit.tn',
@@ -19,11 +19,11 @@ export const profile = {
   about: {
     en: [
       'Software Engineer specialising in enterprise applications, AI integration and system interoperability. I design and deliver reliable, maintainable solutions with C# / .NET, JavaScript / TypeScript, Angular and Python.',
-      'At Bassetti Group, I contribute to TEEXMA, an enterprise knowledge-management and LIMS platform. My recent work covers the integration of an agentic AI assistant, AI-based extraction of safety data sheets with Azure OpenAI, and a LIMS–SAP integration built on .NET REST APIs. My background in cross-platform mobile development (Flutter, .NET MAUI) and web platforms gives me a complete view of the product lifecycle, from requirements to production.',
+      'At Bassetti Group, I work as a full-stack developer on TEEXMA, an enterprise knowledge-management and LIMS platform: front-end in Angular, TypeScript and JavaScript, back-end in C# / .NET, Python and Delphi. My recent work covers the integration of an agentic AI assistant, AI-based extraction of safety data sheets with Azure OpenAI, and a LIMS–SAP integration built on .NET REST APIs. My background in cross-platform mobile development (Flutter, .NET MAUI) and web platforms gives me a complete view of the product lifecycle, from requirements to production.',
     ],
     fr: [
       'Ingénieure logiciel spécialisée dans les applications d’entreprise, l’intégration de l’IA et l’interopérabilité des systèmes. Je conçois et livre des solutions fiables et maintenables en C# / .NET, JavaScript / TypeScript, Angular et Python.',
-      'Chez Bassetti Group, je contribue à TEEXMA, plateforme d’entreprise de gestion des connaissances et LIMS. Mes réalisations récentes couvrent l’intégration d’un assistant IA agentique, l’extraction de fiches de données de sécurité par IA avec Azure OpenAI et une intégration LIMS–SAP reposant sur des API REST .NET. Mon expérience en développement mobile cross-platform (Flutter, .NET MAUI) et en plateformes web me donne une vision complète du cycle de vie produit, du besoin à la mise en production.',
+      'Chez Bassetti Group, je travaille en full-stack sur TEEXMA, plateforme d’entreprise de gestion des connaissances et LIMS : front-end en Angular, TypeScript et JavaScript, back-end en C# / .NET, Python et Delphi. Mes réalisations récentes couvrent l’intégration d’un assistant IA agentique, l’extraction de fiches de données de sécurité par IA avec Azure OpenAI et une intégration LIMS–SAP reposant sur des API REST .NET. Mon expérience en développement mobile cross-platform (Flutter, .NET MAUI) et en plateformes web me donne une vision complète du cycle de vie produit, du besoin à la mise en production.',
     ],
   },
 };
@@ -39,25 +39,25 @@ export type Experience = {
 
 export const experiences: Experience[] = [
   {
-    role: { en: 'Software Engineer', fr: 'Ingénieure Logiciel' },
+    role: { en: 'Full-Stack Software Engineer', fr: 'Ingénieure Logiciel Full-Stack' },
     company: 'Bassetti Group',
     period: { en: '2026 – Present', fr: '2026 – aujourd’hui' },
     current: true,
     stack: ['C#', '.NET', 'JavaScript', 'TypeScript', 'Angular', 'Python', 'Azure OpenAI', 'Delphi', 'SAP API', 'Jenkins', 'SonarQube'],
     points: {
       en: [
+        'Full-stack development: front-end in Angular, TypeScript and JavaScript; back-end in C# / .NET (REST APIs), Python (FastAPI) and Delphi; delivered through pull requests, Jenkins builds and SonarQube quality gates.',
         'Integrated an agentic AI assistant into the web client of TEEXMA, an enterprise knowledge-management and LIMS platform: Angular chat UI, tool-step panel, answer rendering and rating (TypeScript).',
         'Delivered an AI-powered safety-data-sheet extractor: Angular upload portal, Azure OpenAI section extraction, and one-click release packaging of API, portal and file publisher.',
         'Built a laboratory-reception integration between the LIMS and SAP: C# / .NET REST API for scanned samples, authenticated SAP gateway calls, Delphi business module and regression tests.',
         'Shipped platform features in JavaScript and Delphi (time-tracking comments and permissions, generic map) and migrated customer developments to a new major platform version.',
-        'Fixed SonarQube issues and delivered through pull requests, Jenkins builds and bilingual impact analyses.',
       ],
       fr: [
+        'Développement full-stack : front-end Angular / TypeScript / JavaScript, back-end C# / .NET (API REST), Python (FastAPI) et Delphi ; pull requests, builds Jenkins, quality gates SonarQube.',
         'Intégration d’un assistant IA agentique dans le client web de TEEXMA, plateforme d’entreprise de gestion des connaissances et LIMS : interface de chat Angular, panneau des étapes d’outils, rendu et notation des réponses (TypeScript).',
         'Livraison d’un extracteur de fiches de données de sécurité par IA : portail Angular d’import, extraction des sections via Azure OpenAI et packaging en une seule release de l’API, du portail et du publieur de fichiers.',
         'Intégration de la réception laboratoire entre le LIMS et SAP : API REST C# / .NET pour les échantillons scannés, appels authentifiés à la passerelle SAP, module métier Delphi et tests de non-régression.',
         'Fonctionnalités plateforme en JavaScript et Delphi (commentaires et permissions du suivi des temps, carte générique) et migration de développements clients vers une nouvelle version majeure.',
-        'Correction des anomalies SonarQube, livraison via pull requests, builds Jenkins et analyses d’impact bilingues.',
       ],
     },
   },
