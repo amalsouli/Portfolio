@@ -31,13 +31,13 @@
     @apply bg-gradient-to-r from-brand-500 via-lilac-400 to-peach-300 bg-clip-text text-transparent;
   }
   .btn {
-    @apply inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400;
+    @apply inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-[color,background-color,border-color,box-shadow] duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400;
   }
   .btn-primary {
-    @apply btn bg-gradient-to-r from-brand-500 via-brand-400 to-lilac-400 text-white shadow-lg shadow-brand-400/40 hover:-translate-y-0.5 hover:shadow-xl hover:shadow-brand-400/50;
+    @apply btn bg-gradient-to-r from-brand-500 via-brand-400 to-lilac-400 text-white shadow-lg shadow-brand-400/40 hover:shadow-xl hover:shadow-brand-400/50;
   }
   .btn-ghost {
-    @apply btn border-2 border-brand-200 bg-white/60 text-brand-700 hover:-translate-y-0.5 hover:border-brand-400 dark:border-brand-300/20 dark:bg-transparent dark:text-brand-200;
+    @apply btn border-2 border-brand-200 bg-white/60 text-brand-700 hover:border-brand-400 dark:border-brand-300/20 dark:bg-transparent dark:text-brand-200;
   }
   .heading {
     @apply font-display font-semibold tracking-tight text-ink dark:text-white;
@@ -73,4 +73,47 @@
     transition: none !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* Experience books */
+.paper {
+  background-color: #fffaf5;
+  background-image: repeating-linear-gradient(to bottom, transparent 0 31px, rgba(214, 51, 127, 0.07) 31px 32px);
+  color: #2d1b33;
+}
+.dark .paper {
+  background-color: #2a1826;
+  background-image: repeating-linear-gradient(to bottom, transparent 0 31px, rgba(253, 164, 203, 0.06) 31px 32px);
+  color: rgba(253, 242, 248, 0.9);
+}
+.book {
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.book-cover {
+  transform-origin: left center;
+  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.6s;
+}
+.book-pages {
+  position: absolute;
+  inset: 4px 6px 4px 10px;
+  border-radius: 0 12px 12px 0;
+  background: repeating-linear-gradient(to right, #fff 0 2px, #f5e6ee 2px 3px);
+  box-shadow: 0 12px 30px -12px rgba(214, 51, 127, 0.4);
+}
+.dark .book-pages {
+  background: repeating-linear-gradient(to right, #3a2635 0 2px, #2a1826 2px 3px);
+}
+.book:hover,
+.book:focus-visible {
+  transform: translateY(-8px) rotate(-1deg);
+}
+.book:hover .book-cover,
+.book:focus-visible .book-cover {
+  transform: rotateY(-28deg);
+  box-shadow: 18px 18px 40px -12px rgba(214, 51, 127, 0.45);
+}
+.book:focus-visible .book-cover {
+  outline: 3px solid #f973ab;
+  outline-offset: 3px;
 }

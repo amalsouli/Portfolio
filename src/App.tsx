@@ -1,7 +1,9 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { profile, experiences, projects, skills, education, languages, ui, type Lang, type Project } from './data/profile';
 import { GitHubIcon, LinkedInIcon, MailIcon, DownloadIcon, PinIcon, SunIcon, MoonIcon, ArrowIcon } from './components/Icons';
+import { useAnimations } from './animations';
+import ExperienceBooks from './components/ExperienceBooks';
 
 const asset = (p: string) => `${import.meta.env.BASE_URL}${p}`;
 const workProjects = projects.filter((p) => p.work);
@@ -34,17 +36,9 @@ function usePersisted<T extends string>(key: string, initial: T): [T, (v: T) => 
   return [value, set];
 }
 
-function Reveal({ children, delay = 0 }: { children: ReactNode; delay?: number }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-60px' }}
-      transition={{ duration: 0.6, delay, ease: 'easeOut' }}
-    >
-      {children}
-    </motion.div>
-  );
+/** Marks a block for the GSAP scroll reveal (see animations.ts). */
+function Reveal({ children }: { children: ReactNode; delay?: number }) {
+  return <div data-reveal>{children}</div>;
 }
 
 /** Small four-point sparkle used as decoration. */
@@ -61,7 +55,7 @@ function Section({ id, title, kicker, children }: { id: string; title: string; k
     <section id={id} className="container-x relative py-20 sm:py-24">
       <Reveal>
         <p className="font-script text-2xl text-brand-500 dark:text-brand-300">✿ {kicker}</p>
-        <h2 className="heading mt-1 text-4xl sm:text-5xl">
+        <h2 data-split-title className="heading mt-1 text-4xl sm:text-5xl">
           {title}
           <span className="text-brand-400">.</span>
         </h2>
@@ -129,12 +123,18 @@ export default function App() {
   const visible = filter === 'all' ? personalProjects : personalProjects.filter((p) => p.tags.includes(filter as Project['tags'][number]));
   const navItems = Object.entries(ui.nav) as [string, Record<Lang, string>][];
   const [first, ...rest] = profile.name.split(' ');
+  const root = useRef<HTMLDivElement>(null);
+  useAnimations(root, lang);
 
   return (
-    <div className="relative overflow-x-hidden">
+    <div ref={root} className="relative overflow-x-hidden">
       {/* Page background */}
       <div className="bg-mesh pointer-events-none fixed inset-0 -z-10" />
       <div className="bg-dots pointer-events-none fixed inset-0 -z-10" />
+      {/* Scroll progress and custom cursor (GSAP) */}
+      <div data-progress className="fixed inset-x-0 top-0 z-[60] h-1 origin-left scale-x-0 bg-gradient-to-r from-brand-400 via-lilac-400 to-peach-300" />
+      <div data-cursor className="pointer-events-none fixed left-0 top-0 z-[90] hidden h-8 w-8 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-brand-400 opacity-0 mix-blend-multiply dark:mix-blend-screen md:block" />
+      <div data-cursor-dot className="pointer-events-none fixed left-0 top-0 z-[90] hidden h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-500 opacity-0 md:block" />
 
       {/* Header */}
       <header className="fixed inset-x-0 top-3 z-50 px-3">
@@ -172,40 +172,44 @@ export default function App() {
         </nav>
       </header>
 
+      <main key={lang}>
       {/* Hero */}
       <section id="top" className="relative pt-32 pb-16 sm:pt-40 sm:pb-20">
-        <Sparkle className="left-[6%] top-32 h-6 w-6 text-brand-300" />
-        <Sparkle className="left-[45%] top-24 h-4 w-4 text-lilac-300" delay="1s" />
-        <Sparkle className="right-[8%] top-28 h-5 w-5 text-peach-300" delay="2s" />
-        <Sparkle className="bottom-10 left-[30%] h-3 w-3 text-brand-400" delay="1.5s" />
+        <div data-depth="-0.6" className="pointer-events-none absolute inset-0">
+          <Sparkle className="left-[6%] top-32 h-6 w-6 text-brand-300" />
+          <Sparkle className="right-[8%] top-28 h-5 w-5 text-peach-300" delay="2s" />
+        </div>
+        <div data-depth="0.9" className="pointer-events-none absolute inset-0">
+          <Sparkle className="left-[45%] top-24 h-4 w-4 text-lilac-300" delay="1s" />
+          <Sparkle className="bottom-10 left-[30%] h-3 w-3 text-brand-400" delay="1.5s" />
+        </div>
         <div className="container-x relative grid items-center gap-14 md:grid-cols-[1.35fr_1fr]">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7 }}>
-            <p className="inline-flex items-center gap-2 rounded-full border border-brand-200 bg-white/70 px-3.5 py-1 text-xs font-semibold text-brand-700 shadow-sm dark:border-brand-300/20 dark:bg-white/5 dark:text-brand-200">
+          <div>
+            <p data-hero-fade className="inline-flex items-center gap-2 rounded-full border border-brand-200 bg-white/70 px-3.5 py-1 text-xs font-semibold text-brand-700 shadow-sm dark:border-brand-300/20 dark:bg-white/5 dark:text-brand-200">
               <span className="relative flex h-2 w-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-400 opacity-75" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-brand-500" />
               </span>
               {experiences[0].role[lang]} · Bassetti Group
             </p>
-            <p className="mt-6 font-script text-3xl text-ink-soft dark:text-pink-100/70">{ui.hello[lang]}</p>
-            <h1 className="heading text-6xl leading-[0.95] sm:text-8xl">
-              {first}
-              <br />
-              <span className="gradient-text italic">{rest.join(' ')}</span>
+            <p data-hero-fade className="mt-6 font-script text-3xl text-ink-soft dark:text-pink-100/70">{ui.hello[lang]}</p>
+            <h1 className="heading text-6xl leading-[0.95] sm:text-8xl" aria-label={profile.name}>
+              <span data-hero-first className="block">{first}</span>
+              <span data-hero-last className="gradient-text block pb-2 pr-3 italic">{rest.join(' ')}</span>
             </h1>
-            <p className="mt-6 min-h-[2rem] text-lg sm:text-xl">
+            <p data-hero-fade className="mt-6 min-h-[2rem] text-lg sm:text-xl">
               <TypingRoles roles={profile.roles[lang]} />
             </p>
-            <p className="muted mt-5 max-w-xl text-base leading-relaxed">{profile.about[lang][0]}</p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <a className="btn-primary" href={asset(profile.cv[lang])} download>
+            <p data-hero-fade className="muted mt-5 max-w-xl text-base leading-relaxed">{profile.about[lang][0]}</p>
+            <div data-hero-fade className="mt-8 flex flex-wrap gap-3">
+              <a data-magnetic className="btn-primary" href={asset(profile.cv[lang])} download>
                 <DownloadIcon /> {ui.downloadCv[lang]}
               </a>
-              <a className="btn-ghost" href="#contact">
+              <a data-magnetic className="btn-ghost" href="#contact">
                 <MailIcon className="h-4 w-4" /> {ui.contactMe[lang]}
               </a>
             </div>
-            <div className="mt-8 flex items-center gap-3 text-brand-600 dark:text-brand-300">
+            <div data-hero-fade className="mt-8 flex items-center gap-3 text-brand-600 dark:text-brand-300">
               {[
                 { href: profile.github, label: 'GitHub', icon: <GitHubIcon className="h-5 w-5" /> },
                 { href: profile.linkedin, label: 'LinkedIn', icon: <LinkedInIcon className="h-5 w-5" /> },
@@ -213,11 +217,12 @@ export default function App() {
               ].map((s) => (
                 <a
                   key={s.label}
+                  data-magnetic
                   href={s.href}
                   target={s.href.startsWith('http') ? '_blank' : undefined}
                   rel="noreferrer"
                   aria-label={s.label}
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-md shadow-brand-200/50 transition hover:-translate-y-1 hover:rotate-6 dark:bg-white/5 dark:shadow-none"
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-md shadow-brand-200/50 dark:bg-white/5 dark:shadow-none"
                 >
                   {s.icon}
                 </a>
@@ -226,38 +231,45 @@ export default function App() {
                 <PinIcon /> {profile.location[lang]}
               </span>
             </div>
-          </motion.div>
+          </div>
 
-          {/* Photo in a morphing blob */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.85, rotate: -4 }}
-            animate={{ opacity: 1, scale: 1, rotate: 0 }}
-            transition={{ duration: 0.8, delay: 0.15 }}
-            className="relative mx-auto w-64 sm:w-80"
-          >
-            <div className="absolute -inset-5 animate-morph bg-gradient-to-br from-brand-300 via-lilac-300 to-peach-200 opacity-90 blur-[2px] dark:opacity-60" />
-            <div className="absolute -inset-2 animate-morph rounded-full border-2 border-dashed border-brand-300/70 [animation-delay:-4s]" />
-            <img
-              src={asset('avatar.jpg')}
-              alt={profile.name}
-              className="relative aspect-square w-full animate-morph border-[6px] border-white object-cover shadow-2xl shadow-brand-300/40 dark:border-plum-800"
-            />
-            <span className="absolute -left-6 top-6 animate-float text-3xl" aria-hidden="true">🌸</span>
-            <span className="absolute -right-3 bottom-10 animate-float text-2xl [animation-delay:-3s]" aria-hidden="true">✨</span>
-            <div className="absolute -bottom-10 -left-4 flex items-end gap-1 sm:-left-14">
+          {/* Photo in a morphing blob: intro, scroll parallax and mouse tilt are driven by GSAP */}
+          <div data-hero-photo className="relative mx-auto w-64 sm:w-80">
+            <div data-depth="0.4" className="relative">
+              <div className="absolute -inset-5 animate-morph bg-gradient-to-br from-brand-300 via-lilac-300 to-peach-200 opacity-90 blur-[2px] dark:opacity-60" />
+              <div className="absolute -inset-2 animate-morph rounded-full border-2 border-dashed border-brand-300/70 [animation-delay:-4s]" />
+              <img
+                src={asset('avatar.jpg')}
+                alt={profile.name}
+                className="relative aspect-square w-full animate-morph border-[6px] border-white object-cover shadow-2xl shadow-brand-300/40 dark:border-plum-800"
+              />
+            </div>
+            <span data-depth="1.4" className="absolute -left-6 top-6 text-3xl" aria-hidden="true">
+              <span className="block animate-float">🌸</span>
+            </span>
+            <span data-depth="-1.2" className="absolute -right-3 bottom-10 text-2xl" aria-hidden="true">
+              <span className="block animate-float [animation-delay:-3s]">✨</span>
+            </span>
+            <div data-hero-note className="absolute -bottom-10 -left-4 flex items-end gap-1 sm:-left-14">
               <svg viewBox="0 0 60 40" className="h-8 w-12 rotate-12 text-brand-400" aria-hidden="true">
-                <path d="M4 34 C 20 30, 40 22, 54 6" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
-                <path d="M44 6 L 55 5 L 52 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+                <path data-draw d="M4 34 C 20 30, 40 22, 54 6" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
+                <path data-draw d="M44 6 L 55 5 L 52 16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
               <span className="-rotate-6 font-script text-2xl text-brand-600 dark:text-brand-300">{notes.me[lang]}</span>
             </div>
-          </motion.div>
+          </div>
         </div>
+        <a href="#about" data-hero-fade className="absolute bottom-2 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-1 text-xs font-semibold uppercase tracking-[0.25em] text-brand-400 md:flex" aria-label="Scroll">
+          scroll
+          <span className="relative h-9 w-[2px] overflow-hidden rounded-full bg-brand-200 dark:bg-white/10">
+            <span data-scroll-dot className="absolute inset-x-0 top-0 h-3 rounded-full bg-brand-500" />
+          </span>
+        </a>
       </section>
 
       {/* Skills ribbon */}
       <div className="relative -rotate-1 border-y border-brand-200/60 bg-gradient-to-r from-brand-400 via-lilac-400 to-peach-300 py-3 text-white shadow-lg shadow-brand-300/30 dark:border-transparent dark:from-brand-600 dark:via-lilac-500 dark:to-brand-400">
-        <div className="flex w-max animate-marquee gap-8 whitespace-nowrap font-display text-lg italic">
+        <div data-ribbon className="flex w-max animate-marquee gap-8 whitespace-nowrap font-display text-lg italic">
           {[...ribbon, ...ribbon].map((s, i) => (
             <span key={i} className="flex items-center gap-8">
               {s} <span aria-hidden="true">✿</span>
@@ -300,51 +312,7 @@ export default function App() {
 
       {/* Experience */}
       <Section id="experience" kicker="02" title={ui.nav.experience[lang]}>
-        <ol className="relative space-y-8 pl-8 sm:pl-10">
-          <span className="absolute left-[11px] top-2 bottom-2 w-[3px] rounded-full bg-gradient-to-b from-brand-300 via-lilac-300 to-peach-200 sm:left-[15px] dark:opacity-50" aria-hidden="true" />
-          {experiences.map((e, i) => (
-            <li key={e.company + e.period.en} className="relative">
-              <span
-                className={`absolute -left-8 top-5 flex h-6 w-6 items-center justify-center rounded-full text-sm text-white shadow-md sm:-left-10 sm:h-8 sm:w-8 ${
-                  e.current ? 'bg-gradient-to-br from-brand-500 to-lilac-400' : 'bg-brand-300 dark:bg-brand-400/60'
-                }`}
-                aria-hidden="true"
-              >
-                ✿
-              </span>
-              <Reveal delay={Math.min(i * 0.05, 0.2)}>
-                <div className="card p-6 transition hover:-translate-y-0.5 sm:p-7">
-                  <div className="flex flex-wrap items-baseline justify-between gap-2">
-                    <h3 className="heading text-xl">
-                      {e.role[lang]} <span className="italic text-brand-500 dark:text-brand-300">@ {e.company}</span>
-                    </h3>
-                    <span className="muted text-sm font-medium">
-                      {e.current && (
-                        <span className="mr-2 rounded-full bg-gradient-to-r from-brand-400 to-lilac-400 px-2.5 py-0.5 text-xs font-bold text-white">{ui.current[lang]}</span>
-                      )}
-                      {e.period[lang]}
-                    </span>
-                  </div>
-                  <ul className="muted mt-4 space-y-2 text-sm leading-relaxed">
-                    {e.points[lang].map((p) => (
-                      <li key={p} className="flex gap-2">
-                        <span className="mt-[3px] text-brand-400" aria-hidden="true">♡</span>
-                        <span>{p}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  {e.stack.length > 0 && (
-                    <div className="mt-4 flex flex-wrap gap-1.5">
-                      {e.stack.map((s) => (
-                        <span key={s} className="chip">{s}</span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </Reveal>
-            </li>
-          ))}
-        </ol>
+        <ExperienceBooks lang={lang} />
       </Section>
 
       {/* Projects */}
@@ -526,13 +494,13 @@ export default function App() {
             <p className="font-script text-3xl">{notes.say[lang]} ♡</p>
             <p className="relative mx-auto mt-3 max-w-xl text-lg text-white/90">{ui.contactText[lang]}</p>
             <div className="relative mt-8 flex flex-wrap justify-center gap-3">
-              <a className="btn bg-white text-brand-600 shadow-lg hover:-translate-y-0.5" href={`mailto:${profile.email}`}>
+              <a data-magnetic className="btn bg-white text-brand-600 shadow-lg" href={`mailto:${profile.email}`}>
                 <MailIcon className="h-4 w-4" /> {profile.email}
               </a>
-              <a className="btn border-2 border-white/70 text-white hover:-translate-y-0.5 hover:bg-white/10" href={profile.linkedin} target="_blank" rel="noreferrer">
+              <a data-magnetic className="btn border-2 border-white/70 text-white hover:bg-white/10" href={profile.linkedin} target="_blank" rel="noreferrer">
                 <LinkedInIcon className="h-4 w-4" /> LinkedIn
               </a>
-              <a className="btn border-2 border-white/70 text-white hover:-translate-y-0.5 hover:bg-white/10" href={profile.github} target="_blank" rel="noreferrer">
+              <a data-magnetic className="btn border-2 border-white/70 text-white hover:bg-white/10" href={profile.github} target="_blank" rel="noreferrer">
                 <GitHubIcon className="h-4 w-4" /> GitHub
               </a>
             </div>
@@ -555,6 +523,7 @@ export default function App() {
           © {new Date().getFullYear()} · {ui.footer[lang]}
         </p>
       </footer>
+      </main>
     </div>
   );
 }
